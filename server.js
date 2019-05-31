@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const app = express();
 const React = require("react");
 const ReactDOMServer = require("react-dom/server");
@@ -10,8 +11,8 @@ app.use(express.static(path.join(__dirname, "build")));
 
 // create prints directory if doesn't exist
 const dir = __dirname + "/prints";
-if (!path.existsSync(dir)) {
-  fs.mkdirSync(dir, 0744);
+if (!fs.existsSync(dir)) {
+  fs.mkdirSync(dir);
 }
 
 // components
@@ -22,12 +23,13 @@ app.get("/api/print", function(req, res) {
   const HTMLString = ReactDOMServer.renderToString(<CanvasElement />);
 
   // PDF CONFIG
+  const template = fs.readFileSync(`${__dirname}/templates/pdf.html`, `utf8`);
   const document = {
-    template: "./templates/pdf.html",
+    template,
     context: {
       element: HTMLString,
     },
-    path: `./prints/${GUID}`,
+    path: `${__dirname}/prints/${GUID}.pdf`,
   };
 
   const options = {
@@ -39,6 +41,11 @@ app.get("/api/print", function(req, res) {
   pdf
     .create(document, options)
     .then(response => {
+      res.setHeader(
+        "Content-disposition",
+        'inline; filename="' + response.filename + '"'
+      );
+      res.setHeader("Content-type", "application/pdf");
       res.status(200).sendFile(response.filename);
     })
     .catch(err => console.log(err));

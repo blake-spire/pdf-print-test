@@ -1,11 +1,16 @@
 import React, { Component } from "react";
 import CanvasElement from "./CanvasElement";
 import axios from "axios";
+import fileDownload from "js-file-download";
 
 class App extends Component {
-  handleClick = e => {
-    console.log("hii");
-    axios.get("api/print");
+  handleClick = () => {
+    axios
+      .get("api/print")
+      .then(results => {
+        fileDownload(results.data, "print.pdf");
+      })
+      .catch(err => console.log(err));
   };
 
   render() {
