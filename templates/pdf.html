@@ -5,12 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>PDF TEMPLATE</title>
+    <!-- add react -->
+    <script
+      crossorigin
+      src="https://unpkg.com/react@16/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"
+    ></script>
+
+    <!-- styles -->
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <h1>THIS IS A TEST PDF</h1>
-    <img
-      alt="canvas-element"
-      src="data:image/jpeg;charset=utf-8;base64,{{ base64String }}"
-    />
+
+    <main id="root"></main>
+
+    <div class="hidden" id="element">{{{ HTMLString }}}</div>
+
+    <script>
+      // wait for page to load
+      window.addEventListener("load", function() {
+        init();
+      });
+
+      function init() {
+        const element = document.getElementById("htmlstring");
+        ReactDOM.render(element, document.getElementById("root"));
+      }
+    </script>
   </body>
 </html>

@@ -22,7 +22,7 @@ class App extends Component {
       <section>
         <h1>SSR-TEST</h1>
         <button onClick={this.handleClick}>EXPORT CANVAS ELEMENT AS PDF</button>
-        <CanvasElement />
+        <CanvasElement red="rgb(200, 0, 0)" blue="rgba(0, 0, 200, 0.5)" />
       </section>
     );
   }

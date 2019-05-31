@@ -6,10 +6,10 @@ class CanvasElement extends Component {
     if (canvas.getContext) {
       const ctx = canvas.getContext("2d");
 
-      ctx.fillStyle = "rgb(200, 0, 0)";
+      ctx.fillStyle = this.props.red;
       ctx.fillRect(20, 20, 100, 100);
 
-      ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+      ctx.fillStyle = this.props.blue;
       ctx.fillRect(60, 60, 100, 100);
     }
   }
