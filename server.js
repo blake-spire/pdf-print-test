@@ -8,6 +8,12 @@ const uuidv4 = require("uuid/v4");
 
 app.use(express.static(path.join(__dirname, "build")));
 
+// create prints directory if doesn't exist
+const dir = __dirname + "/prints";
+if (!path.existsSync(dir)) {
+  fs.mkdirSync(dir, 0744);
+}
+
 // components
 const CanvasElement = require("./src/CanvasElement").default;
 
