@@ -12,7 +12,7 @@ class App extends Component {
     return (
       <section>
         <h1>SSR-TEST</h1>
-        <button onClick={this.handlePrint}>EXPORT CANVAS ELEMENT AS PDF</button>
+        <button onClick={this.handleClick}>EXPORT CANVAS ELEMENT AS PDF</button>
         <CanvasElement />
       </section>
     );
