@@ -21,6 +21,19 @@ const CanvasElement = require("./src/CanvasElement").default;
 app.get("/api/print", function(req, res) {
   const GUID = uuidv4();
   const HTMLString = ReactDOMServer.renderToString(<CanvasElement />);
+  const staticString = ReactDOMServer.renderToStaticMarkup(<CanvasElement />);
+  const nodeString = ReactDOMServer.renderToNodeStream(<CanvasElement />);
+  const staticNodeString = ReactDOMServer.renderToStaticNodeStream(
+    <CanvasElement />
+  );
+
+  console.log(HTMLString);
+  console.log("\n------\n");
+  console.log(staticString);
+  console.log("\n------\n");
+  console.log(nodeString);
+  console.log("\n------\n");
+  console.log(staticNodeString);
 
   // PDF CONFIG
   const template = fs.readFileSync(`${__dirname}/templates/pdf.html`, `utf8`);
