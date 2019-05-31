@@ -30,7 +30,7 @@ app.get("/api/print", async (req, res) => {
     <CanvasElement red="rgb(200, 0, 0)" blue="rgba(0, 0, 200, 0.5)" />
   );
 
-  const source = fs.readFileSync(`${__dirname}/templates/pdf.html`, `utf8`);
+  const source = fs.readFileSync(`${__dirname}/templates/react.html`, `utf8`);
   const template = Handlebars.compile(source);
   const context = {
     HTMLString,
@@ -39,36 +39,53 @@ app.get("/api/print", async (req, res) => {
 
   /* PUPPETEER CODE */
   // launch browser
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+  try {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
 
-  await page.setContent(html, { waitUntil: "networkidle2" });
+    // load html
+    await page.setContent(html, { waitUntil: "networkidle2" });
 
-  // close browser
-  await browser.close();
+    // take screenshot
+    const element = await page.$("#root");
+    const clip = await element.boundingBox();
 
-  res.status(200).send("success");
+    const base64String = await page.screenshot({
+      clip,
+      encoding: "base64",
+    });
+
+    // close browser
+    await browser.close();
+  } catch (error) {
+    console.log("error in puppeteer", error);
+  }
 
   // PDF CONFIG
-  // const options = {
-  //   format: "letter",
-  //   orientation: "portrait",
-  //   border: "10mm",
-  // };
-  // const document = {
-  //   template: source,
-  //   context: {
-  //     base64String,
-  //   },
-  //   path: `${printDir}/${fileCount}.pdf`,
-  // };
+  const PDFTemplate = fs.readFileSync(
+    `${__dirname}/templates/pdf.html`,
+    `utf8`
+  );
+  const options = {
+    format: "letter",
+    orientation: "portrait",
+    border: "10mm",
+  };
+  const document = {
+    template: PDFTemplate,
+    context: {
+      base64String,
+      fileCount,
+    },
+    path: `${printDir}/${fileCount}.pdf`,
+  };
 
-  // pdf
-  //   .create(document, options)
-  //   .then(({ filename }) => {
-  //     res.status(200).send(filename);
-  //   })
-  //   .catch(err => console.log(err));
+  pdf
+    .create(document, options)
+    .then(({ filename }) => {
+      res.status(200).send(filename);
+    })
+    .catch(err => console.log(err));
 });
 
 app.get("/", function(req, res) {

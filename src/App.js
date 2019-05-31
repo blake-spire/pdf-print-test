@@ -8,6 +8,7 @@ class App extends Component {
     axios
       .get("api/print")
       .then(({ data: filename }) => {
+        console.log(filename);
         PrintJS({
           printable: filename,
           type: "pdf",
