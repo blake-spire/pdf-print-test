@@ -4,17 +4,18 @@ const fs = require("fs");
 const app = express();
 const pdf = require("dynamic-html-pdf");
 const puppeteer = require("puppeteer");
+const ReactDOM = require("react-dom");
 
 app.use(express.static(path.join(__dirname, "build")));
 
-// create prints and screenshot directory if doesn't exist
+// component
+const CanvasElement = require("./src/CanvasElement");
+
+// create prints directory if doesn't exist
 const printDir = __dirname + "/prints";
-const screenshotDir = __dirname + "/screenshots";
-[printDir, screenshotDir].forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-  }
-});
+if (!fs.existsSync(printDir)) {
+  fs.mkdirSync(printDir);
+}
 
 app.get("/api/print", async (req, res) => {
   let fileCount = 0;
@@ -22,10 +23,13 @@ app.get("/api/print", async (req, res) => {
     fileCount = files.length;
   });
 
-  // puppeteer code
+  /* PUPPETEER CODE */
+  // launch browser
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+
   await page.goto("http://localhost:3000", { waitUntil: "networkidle2" });
+
   // get canvas and dimensions
   const canvas = await page.$("#canvas");
   const canvasDimensions = await canvas.boundingBox();
