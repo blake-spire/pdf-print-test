@@ -2,12 +2,19 @@
   "name": "ssr-test",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8080",
   "dependencies": {
+    "axios": "^0.19.0",
+    "dynamic-html-pdf": "^1.0.0",
+    "express": "^4.17.1",
+    "nodemon": "^1.19.1",
+    "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1"
   },
   "scripts": {
+    "start-server": "nodemon server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
