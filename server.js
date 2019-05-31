@@ -2,47 +2,49 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const app = express();
-const React = require("react");
-const ReactDOMServer = require("react-dom/server");
 const pdf = require("dynamic-html-pdf");
-const uuidv4 = require("uuid/v4");
+const puppeteer = require("puppeteer");
 
 app.use(express.static(path.join(__dirname, "build")));
 
-// create prints directory if doesn't exist
-const dir = __dirname + "/prints";
-if (!fs.existsSync(dir)) {
-  fs.mkdirSync(dir);
-}
+// create prints and screenshot directory if doesn't exist
+const printDir = __dirname + "/prints";
+const screenshotDir = __dirname + "/screenshots";
+[printDir, screenshotDir].forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+});
 
-// components
-const CanvasElement = require("./src/CanvasElement").default;
+app.get("/api/print", async (req, res) => {
+  let fileCount = 0;
+  fs.readdir(printDir, (err, files) => {
+    fileCount = files.length;
+  });
 
-app.get("/api/print", function(req, res) {
-  const GUID = uuidv4();
-  const HTMLString = ReactDOMServer.renderToString(<CanvasElement />);
-  const staticString = ReactDOMServer.renderToStaticMarkup(<CanvasElement />);
-  const nodeString = ReactDOMServer.renderToNodeStream(<CanvasElement />);
-  const staticNodeString = ReactDOMServer.renderToStaticNodeStream(
-    <CanvasElement />
-  );
-
-  console.log(HTMLString);
-  console.log("\n------\n");
-  console.log(staticString);
-  console.log("\n------\n");
-  console.log(nodeString);
-  console.log("\n------\n");
-  console.log(staticNodeString);
+  // puppeteer code
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto("http://localhost:3000", { waitUntil: "networkidle2" });
+  // get canvas and dimensions
+  const canvas = await page.$("#canvas");
+  const canvasDimensions = await canvas.boundingBox();
+  // get screenshot as base64 string
+  const base64String = await page.screenshot({
+    clip: canvasDimensions,
+    encoding: "base64",
+  });
+  // close browser
+  await browser.close();
 
   // PDF CONFIG
   const template = fs.readFileSync(`${__dirname}/templates/pdf.html`, `utf8`);
   const document = {
     template,
     context: {
-      element: HTMLString,
+      base64String,
     },
-    path: `${__dirname}/prints/${GUID}.pdf`,
+    path: `${printDir}/${fileCount}.pdf`,
   };
 
   const options = {
@@ -53,13 +55,8 @@ app.get("/api/print", function(req, res) {
 
   pdf
     .create(document, options)
-    .then(response => {
-      res.setHeader(
-        "Content-disposition",
-        'inline; filename="' + response.filename + '"'
-      );
-      res.setHeader("Content-type", "application/pdf");
-      res.status(200).sendFile(response.filename);
+    .then(({ filename }) => {
+      res.status(200).send(filename);
     })
     .catch(err => console.log(err));
 });
