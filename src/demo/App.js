@@ -1,8 +1,11 @@
 import React, { Component } from "react";
-import CanvasElement from "./CanvasElement";
+import CanvasElement from "../common/CanvasElement";
 import axios from "axios";
 import PrintJS from "print-js/src/index.js";
 
+/**
+ * Entrypoint for the demonstration front-end 
+ */
 class App extends Component {
   handleClick = () => {
     axios

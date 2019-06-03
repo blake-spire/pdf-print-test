@@ -5,44 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>REACT TEMPLATE</title>
-    <!-- add react -->
-    <script
-      crossorigin
-      src="https://unpkg.com/react@16/umd/react.production.min.js"
-    ></script>
-    <script
-      crossorigin
-      src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"
-    ></script>
-
-    <!-- styles -->
-    <style>
-      .hidden {
-        display: none;
-      }
-    </style>
   </head>
   <body>
     <main id="root"></main>
-
-    <div class="hidden" id="element">{{{ HTMLString }}}</div>
-
-    <script>
-      // wait for page to load and handlebars to do its thing
-      window.addEventListener("load", function() {
-        init();
-      });
-
-      function init() {
-        const element = document.getElementById("htmlstring");
-        const content = element.innerHTML;
-
-        const App = () => {
-          return content;
-        };
-
-        ReactDOM.render(App, document.getElementById("root"));
-      }
-    </script>
+    <script>{{{ script }}}</script>
   </body>
 </html>

@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 
+/**
+ * Entrypoint for the component we wish to render/screenshot
+ */
 class CanvasElement extends Component {
   componentDidMount() {
     const canvas = document.getElementById("canvas");

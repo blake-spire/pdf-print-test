@@ -3,6 +3,6 @@
 Testing Dynamic-HTML-PDF library with SSR techniques
 
 ```
+$ npm run build
 $ npm start
-$ npm run start-server
 ```
