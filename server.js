@@ -8,10 +8,10 @@ const React = require("react");
 const ReactDOMServer = require("react-dom/server");
 const Handlebars = require("handlebars");
 
-app.use(express.static(path.join(__dirname, "build")));
+app.use('/public', express.static(path.join(__dirname, "dist")));
 
 // components
-const CanvasElement = require("./src/CanvasElement").default;
+const CanvasElement = require("./src/common/CanvasElement").default;
 
 // create prints directory if doesn't exist
 const printDir = __dirname + "/prints";
@@ -25,32 +25,55 @@ app.get("/api/print", async (req, res) => {
     fileCount = files.length;
   });
 
-  // get html string
-  const HTMLString = ReactDOMServer.renderToString(
-    <CanvasElement red="rgb(200, 0, 0)" blue="rgba(0, 0, 200, 0.5)" />
-  );
-
   const source = fs.readFileSync(`${__dirname}/templates/react.html`, `utf8`);
   const template = Handlebars.compile(source);
   const context = {
-    HTMLString,
+    script: fs.readFileSync(`${__dirname}/dist/server.js`, `utf8`),
   };
   const html = template(context);
 
   /* PUPPETEER CODE */
   // launch browser
+  let base64String;
+
   try {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      /** @todo setup sandbox */
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     const page = await browser.newPage();
 
+    page.on('console', msg => console.log('PAGE:', msg.text(), msg));
+    
     // load html
     await page.setContent(html, { waitUntil: "networkidle2" });
+
+    /** @todo wait for someting else */
+    await page.waitFor(1000 * 2);
+
+    /**
+     * Evaluate a script in the context of a page
+     * 'renderComponent' is attached to window by the server's App script
+     * only seems to work with serializable parameers (not able to pass component classes directly)
+     */
+    await page.evaluate(() => {
+      renderComponent({
+        red: 'rgb(200, 0, 0)',
+        blue: 'rgba(0, 0, 200, 0.5)',
+      }, document.getElementById('root'));
+    });
+
+    /**
+     * @todo server's App.js component should set a class to indicate the inner Component as been loaded
+     * (expect the common Component to have an 'onLoaded' prop)
+    */
+    await page.waitFor(1000 * 2);
 
     // take screenshot
     const element = await page.$("#root");
     const clip = await element.boundingBox();
 
-    const base64String = await page.screenshot({
+    base64String = await page.screenshot({
       clip,
       encoding: "base64",
     });
@@ -77,6 +100,7 @@ app.get("/api/print", async (req, res) => {
       base64String,
       fileCount,
     },
+    /** @todo Fix this. broke this by changing express static server path? */
     path: `${printDir}/${fileCount}.pdf`,
   };
 
@@ -89,7 +113,7 @@ app.get("/api/print", async (req, res) => {
 });
 
 app.get("/", function(req, res) {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(process.env.PORT || 8080);

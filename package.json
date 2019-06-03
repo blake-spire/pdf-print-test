@@ -2,36 +2,39 @@
   "name": "ssr-test",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:8080",
   "scripts": {
-    "start-server": "nodemon server.js --exec babel-node --presets=@babel/preset-env,@babel/preset-react --plugins @babel/plugin-syntax-dynamic-import",
-    "start": "BROWSER=none react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "nodemon server.js --exec babel-node --presets=@babel/preset-env,@babel/preset-react --plugins @babel/plugin-syntax-dynamic-import",
+    "build": "webpack -p"
   },
   "dependencies": {
     "axios": "^0.19.0",
+    "css-loader": "^2.1.1",
     "dynamic-html-pdf": "^1.0.0",
     "express": "^4.17.1",
     "handlebars": "^4.1.2",
-    "node-sass": "^4.12.0",
     "nodemon": "^1.19.1",
     "print-js": "^1.0.61",
     "prop-types": "^15.7.2",
     "puppeteer": "^1.17.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1",
+    "style-loader": "^0.23.1",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
     "@babel/node": "^7.4.5",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/preset-env": "^7.4.5",
-    "@babel/preset-react": "^7.0.0"
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.6",
+    "node-sass": "^4.12.0",
+    "sass-loader": "^7.1.0",
+    "webpack": "^4.32.2",
+    "webpack-cli": "^3.3.2",
+    "webpack-dev-middleware": "^3.7.0"
   },
   "eslintConfig": {
     "extends": "react-app"
